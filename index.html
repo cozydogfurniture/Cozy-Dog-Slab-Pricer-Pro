@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <meta name="apple-mobile-web-app-title" content="Slab Pricer"/>
+  <title>Slab Pricer Pro</title>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{background:#f4f4f0;font-family:Arial,sans-serif;color:#1a1a0e;}
+    .hdr{background:#1a1a0e;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;}
+    .hdr img{height:46px;width:auto;}
+    .hdr-title{font-size:1.1rem;font-weight:900;color:#fff;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+    .hdr-sub{font-size:.68rem;color:#aaa890;letter-spacing:.12em;text-transform:uppercase;margin-top:.15rem;}
+    .page{padding:.85rem;display:flex;flex-direction:column;gap:.85rem;max-width:640px;margin:0 auto;}
+    .card{background:#fff;border:1px solid #e0ddd4;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .card-title{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;margin-bottom:.85rem;padding-bottom:.5rem;border-bottom:2px solid #f5b800;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+    .field{display:flex;flex-direction:column;gap:.28rem;}
+    .lbl{font-size:.62rem;color:#6b6650;letter-spacing:.1em;text-transform:uppercase;font-weight:700;}
+    input,select{background:#fff;border:1.5px solid #e0ddd4;color:#1a1a0e;font-family:Arial,sans-serif;font-size:.95rem;padding:.55rem .75rem;outline:none;width:100%;border-radius:6px;-webkit-appearance:none;}
+    input[type=number]{-moz-appearance:textfield;}
+    .w-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:.4rem;}
+    .w-inp{text-align:center;padding:.5rem .4rem;}
+    .w-lbl{font-size:.55rem;color:#6b6650;text-align:center;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:.2rem;}
+    .pt-btns{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem;}
+    .pt-btn{padding:.35rem .85rem;border:1.5px solid #e0ddd4;border-radius:5px;cursor:pointer;font-size:.72rem;font-family:Arial,sans-serif;background:#fff;color:#6b6650;}
+    .pt-btn.active{background:#fffbe6;border-color:#f5b800;border-width:2.5px;color:#1a1a0e;font-weight:800;}
+    .chip{padding:.55rem .65rem;background:#fff;border:1.5px solid #e0ddd4;border-radius:6px;cursor:pointer;font-size:.78rem;line-height:1.3;color:#6b6650;user-select:none;}
+    .chip.active-amber{background:#fffbe6;border-color:#f5b800;border-width:2.5px;color:#1a1a0e;font-weight:700;}
+    .chip.active-green{background:rgba(58,122,42,.1);border-color:#3a7a2a;color:#3a7a2a;font-weight:700;}
+    .chip-mult{font-size:.6rem;color:#f5b800;}
+    .chip.active-amber .chip-mult{color:#1a1a0e;}
+    .chip-desc{font-size:.6rem;color:#6b6650;margin-top:.1rem;}
+    .chip-sub{font-size:.6rem;color:#5aaa3a;margin-top:.15rem;}
+    .chip-edit{width:52px;font-size:.75rem;padding:.15rem .3rem;border:1px solid rgba(0,0,0,.2);border-radius:3px;text-align:center;background:rgba(255,255,255,.5);color:inherit;font-family:Arial,sans-serif;margin-top:.2rem;}
+    .chip.active-amber .chip-edit{background:#fff;border-color:rgba(0,0,0,.25);color:#1a1a0e;}
+    .chip.active-green .chip-edit{background:rgba(255,255,255,.4);border-color:rgba(58,122,42,.4);color:#3a7a2a;}
+    .profile-box{background:#f9f8f4;border:1.5px solid #e0ddd4;border-radius:6px;padding:.75rem;margin-top:.75rem;}
+    .avg-lbl{font-size:.68rem;color:#6b6650;margin-top:.4rem;text-align:right;font-weight:700;}
+    .divider{border-top:3px solid #f5b800;}
+    .meta-row{display:flex;justify-content:space-between;align-items:center;padding:.65rem .85rem;background:#f9f8f4;margin-bottom:2px;border-radius:4px;}
+    .meta-lbl{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:#6b6650;font-weight:700;}
+    .meta-val{font-size:.9rem;font-weight:500;}
+    .price-hero{background:#f5b800;border-radius:8px;padding:1.25rem;text-align:center;margin-bottom:1rem;}
+    .price-lbl{font-size:.62rem;color:#6b6650;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.2rem;font-weight:700;}
+    .price-big{font-size:3rem;font-weight:900;color:#1a1a0e;line-height:1;}
+    .price-range{font-size:.65rem;color:#6b6650;margin-top:.25rem;font-weight:600;}
+    .y-bar-wrap{height:22px;background:#e0ddd4;border-radius:4px;display:flex;overflow:hidden;margin:.5rem 0;}
+    .y-bar-usable{background:#3a7a2a;display:flex;align-items:center;justify-content:center;}
+    .y-bar-wane{background:#5a4020;}
+    .y-bar-lbl{font-size:.58rem;color:#0f2008;font-weight:bold;}
+    .lgnd{display:flex;gap:1rem;font-size:.62rem;color:#6b6650;flex-wrap:wrap;}
+    .pb-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem .85rem;background:#f9f8f4;margin-bottom:2px;border-radius:4px;}
+    .pb-row.last{background:rgba(245,184,0,.15);}
+    .pb-lbl{font-size:.62rem;color:#6b6650;}
+    .pb-lbl.last{color:#c49200;}
+    .pb-val{font-size:.82rem;color:#1a1a0e;}
+    .pb-val.last{font-size:1rem;color:#f5b800;font-weight:bold;}
+    .sec-lbl{font-size:.58rem;color:#6b6650;letter-spacing:.12em;text-transform:uppercase;margin-top:1rem;margin-bottom:.25rem;}
+    .empty{text-align:center;padding:2rem 1rem;color:#c8c4b0;}
+    .empty-dash{font-size:2.5rem;margin-bottom:.5rem;}
+    .empty-txt{font-size:.72rem;line-height:1.8;}
+    .dollar-wrap{display:flex;}
+    .dollar-prefix{background:#f9f8f4;border:1.5px solid #e0ddd4;border-right:none;padding:.55rem .5rem;color:#6b6650;font-size:.85rem;border-radius:6px 0 0 6px;white-space:nowrap;}
+    .dollar-inp{border-left:none!important;border-radius:0 6px 6px 0!important;}
+
+    @media print {
+      body > *:not(#quote-overlay) { display: none !important; }
+      #quote-overlay { display: block !important; position: static !important; background: white !important; padding: 0 !important; }
+      #quote-sheet { box-shadow: none !important; border-radius: 0 !important; }
+      #quote-split { flex-direction: column !important; }
+      #quote-editor-panel { display: none !important; }
+      #quote-close-btn, #quote-img-btn, .quote-action-bar { display: none !important; }
+    }
+    #quote-overlay {
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;
+      overflow-y:auto;padding:.75rem;box-sizing:border-box;
+    }
+    #quote-sheet {
+      background:#fff;max-width:960px;margin:0 auto;border-radius:10px;overflow:hidden;
+      font-family:Arial,sans-serif;box-shadow:0 8px 40px rgba(0,0,0,.5);
+    }
+    #quote-content {
+      display:flex;flex-direction:column;
+    }
+    #quote-split {
+      display:flex;min-height:480px;
+    }
+    #quote-editor-panel {
+      width:230px;min-width:230px;background:#1a1a0e;padding:1rem;
+      overflow-y:auto;border-right:2.5px solid #f5b800;flex-shrink:0;
+    }
+    #client-quote-panel {
+      flex:1;background:#fff;overflow-y:auto;min-width:0;
+    }
+    @media(max-width:600px){
+      #quote-split { flex-direction:column; }
+      #quote-editor-panel { width:100%;min-width:0;border-right:none;border-bottom:2.5px solid #f5b800; }
+    }
+    </style>
+</head>
+<body>
+<div class="hdr" style="padding:.9rem 1rem .7rem;display:flex;align-items:center;justify-content:center;gap:.65rem;">
+  <div style="min-width:0;">
+    <div class="hdr-title">Slab Pricer Pro</div>
+    <div class="hdr-sub">Live Edge Lumber Pricing</div>
+  </div>
+</div>
+
+<!-- BANNER -->
+<div style="background:#f5b800;padding:.35rem 1rem;display:flex;align-items:center;justify-content:center;gap:.6rem;">
+  <div style="font-size:.6rem;font-weight:700;color:#1a1a0e;letter-spacing:.08em;text-transform:uppercase;">Powered by</div>
+  
+  <div style="font-size:.6rem;font-weight:900;color:#1a1a0e;letter-spacing:.08em;text-transform:uppercase;">Cozy Dog Furniture</div>
+</div>
+<div class="page">
+  <!-- ① Species -->
+  <div class="card">
+    <div class="card-title">① Species &amp; Base Rate</div>
+    <div class="grid2" style="margin-bottom:.6rem">
+      <div class="field">
+        <div class="lbl">Species</div>
+        <select id="sp" onchange="onSpecies(this.value)">
+          <option>Black Walnut</option><option>White Oak</option><option>Hard Maple</option>
+          <option>Cherry</option><option>Ash</option><option>Elm</option>
+          <option>Sycamore</option><option>Cedar</option><option>Live Oak</option>
+          <option>Mesquite</option><option>Custom</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="lbl">Rate $/BF <span style="color:#f5b800;font-size:.5rem">EDITABLE</span></div>
+        <div class="dollar-wrap">
+          <span class="dollar-prefix">$</span>
+          <input class="dollar-inp" id="rate" type="number" value="9" inputmode="decimal" step="0.5" min="0" onchange="recalc()" onblur="recalc()"/>
+        </div>
+      </div>
+    </div>
+    <div class="field" id="custom-name-row" style="display:none">
+      <div class="lbl">Species Name</div>
+      <input id="customName" type="text" placeholder="e.g. Mulberry"/>
+    </div>
+  </div>
+
+  <!-- ② Dimensions -->
+  <div class="card">
+    <div class="card-title">② Dimensions</div>
+    <div class="grid2">
+      <div class="field"><div class="lbl">Thickness (in) *</div>
+        <input id="thickness" type="number" inputmode="decimal" placeholder="e.g. 2.5" step="0.25" min="0" onchange="recalc()" onblur="recalc()"/>
+      </div>
+      <div class="field"><div class="lbl">Length (ft) *</div>
+        <input id="lengthFt" type="number" inputmode="decimal" placeholder="e.g. 8" step="0.5" min="0" onchange="recalc()" onblur="recalc()"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ Widths -->
+  <div class="card">
+    <div class="card-title">③ Width Measurements (inches)</div>
+    <div class="pt-btns" id="pt-btns"></div>
+    <div class="w-grid" id="w-grid"></div>
+    <div class="profile-box" id="profile-box"></div>
+    <div class="avg-lbl" id="avg-lbl" style="display:none"></div>
+  </div>
+
+  <!-- ④ Wane -->
+  <div class="card">
+    <div class="card-title">④ Live Edge Wane</div>
+    <div class="grid2" id="wane-chips"></div>
+  </div>
+
+  <!-- ⑤ Quality -->
+  <div class="card">
+    <div class="card-title">⑤ Quality Grade</div>
+    <div class="grid2" id="qual-chips"></div>
+  </div>
+
+  <!-- ⑥ Drying -->
+  <div class="card">
+    <div class="card-title">⑥ Drying Status</div>
+    <div class="grid2" id="dry-chips"></div>
+  </div>
+
+  <!-- ⑦ Surface Finish -->
+  <div class="card">
+    <div class="card-title">⑦ Surface Finish</div>
+    <div class="grid2" id="finish-chips"></div>
+  </div>
+
+  <!-- ⑧ Margin -->
+  <div class="card">
+    <div class="card-title">⑧ Profit Margin</div>
+    <div style="max-width:180px">
+      <div class="field"><div class="lbl">Target Margin %</div>
+        <input id="margin" type="number" inputmode="decimal" value="20" step="5" min="0" max="300" onchange="recalc()" onblur="recalc()"/>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="divider"></div>
+
+  <!-- Recalculate button -->
+  <button onclick="recalc()" style="width:100%;padding:.85rem;background:#f5b800;border:none;border-radius:8px;font-size:.9rem;font-weight:900;font-family:Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:#1a1a0e;">↻ (Re)Calculate</button>
+  <button onclick="generateQuote()" style="width:100%;padding:.85rem;background:#1a1a0e;border:none;border-radius:8px;font-size:.9rem;font-weight:900;font-family:Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:#f5b800;margin-top:.5rem;">📄 Generate Quote</button>
+
+  <!-- Summary -->
+  <div class="card">
+    <div class="card-title">Pricing Summary</div>
+    <div id="summary"></div>
+  </div>
+</div>
+
+<script>
+let FINISH=[{l:"Rough Sawn",m:1.0},{l:"Skip Planed",m:1.15},{l:"Planed",m:1.25},{l:"Sanded",m:1.4}];
+let finishIdx=0;
+let QUALITY=[{l:"Standard",d:"Clean, minimal figure",m:1.0},{l:"Select",d:"Nice grain, few defects",m:1.35},{l:"Premium",d:"Strong figure, dramatic grain",m:1.75},{l:"Showcase",d:"Exceptional burl, crotch, figure",m:2.4}];
+let DRYING=[{l:"Green (fresh cut)",m:0.7},{l:"Air-dried (partial)",m:0.85},{l:"Air-dried (complete)",m:1.0},{l:"Kiln-dried",m:1.2}];
+let WANE=[{l:"Minimal ≤1\"",p:0.06},{l:"Moderate 1–2\"",p:0.12},{l:"Heavy 2–4\"",p:0.20},{l:"Very Heavy >4\"",p:0.30}];
+
+let numPts=5, waneIdx=1, qualIdx=0, dryIdx=2;
+let widths=Array(20).fill("");
+
+function g(id){return document.getElementById(id);}
+
+function onSpecies(v){
+  g("custom-name-row").style.display=v==="Custom"?"":"none";
+}
+
+function setNumPts(n){
+  numPts=n;
+  renderPtBtns();
+  renderWidthGrid();
+  recalc();
+}
+
+function setWane(i){waneIdx=i;renderWaneChips();}
+function setQual(i){qualIdx=i;renderQualChips();}
+function setDry(i){dryIdx=i;renderDryChips();}
+
+function renderPtBtns(){
+  g("pt-btns").innerHTML=[3,5,7,10].map(n=>`<button class="pt-btn${numPts===n?" active":""}" onclick="setNumPts(${n})">${n} points</button>`).join("")+`<input type="number" id="custom-pts" min="2" max="20" step="1" placeholder="Custom" value="${![3,5,7,10].includes(numPts)?numPts:''}" style="width:72px;padding:.3rem .4rem;border:1.5px solid ${![3,5,7,10].includes(numPts)?'#f5b800':'#e0ddd4'};border-radius:5px;font-size:.72rem;font-family:Arial,sans-serif;color:#1a1a0e;background:${![3,5,7,10].includes(numPts)?'#fffbe6':'#fff'};font-weight:${![3,5,7,10].includes(numPts)?'800':'400'}" onchange="setNumPts(Math.min(20,Math.max(2,parseInt(this.value)||5)))" onblur="setNumPts(Math.min(20,Math.max(2,parseInt(this.value)||5)))"/>`;
+}
+
+function renderWidthGrid(){
+  const labels=Array.from({length:numPts},(_,i)=>i===0?"End A":i===numPts-1?"End B":"W"+(i+1));
+  g("w-grid").innerHTML=labels.map((lbl,i)=>`
+    <div>
+      <div class="w-lbl">${lbl}</div>
+      <input class="w-inp" type="number" inputmode="decimal" id="w${i}" value="${widths[i]}" placeholder="—" step="0.25" min="0"
+        onchange="widths[${i}]=this.value;recalc()"
+        onblur="widths[${i}]=this.value;recalc()"/>
+    </div>`).join("");
+}
+
+function renderChips(containerId,labels,activeIdx,fn,style){
+  g(containerId).innerHTML=labels.map((l,i)=>`<div class="chip${activeIdx===i?" active-"+style:""}" onclick="${fn}(${i})">${l}</div>`).join("");
+}
+
+function stopProp(e){e.stopPropagation();}
+function setWaneVal(i,v){WANE[i].p=Math.max(0,Math.min(1,parseFloat(v)||0));recalc();}
+function setQualMult(i,v){QUALITY[i].m=Math.max(0,parseFloat(v)||0);recalc();}
+function setDryMult(i,v){DRYING[i].m=Math.max(0,parseFloat(v)||0);recalc();}
+
+function setFinish(i){finishIdx=i;renderFinishChips();}
+function setFinishMult(i,v){FINISH[i].m=Math.max(0,parseFloat(v)||0);recalc();}
+function renderFinishChips(){
+  g("finish-chips").innerHTML=FINISH.map((f,i)=>`<div class="chip${finishIdx===i?" active-amber":""}" onclick="setFinish(${i})"><div style="font-weight:bold;margin:.1rem 0">${f.l}</div><input class="chip-edit" type="number" value="${f.m}" min="0" step="0.05" onclick="stopProp(event)" onchange="stopProp(event);setFinishMult(${i},this.value)" onblur="setFinishMult(${i},this.value)"> <span style="font-size:.6rem">mult</span></div>`).join("");
+}
+
+function renderWaneChips(){
+  g("wane-chips").innerHTML=WANE.map((w,i)=>`<div class="chip${waneIdx===i?" active-amber":""}" onclick="setWane(${i})">${w.l}<br><input class="chip-edit" type="number" value="${(w.p*100).toFixed(0)}" min="0" max="100" step="1" onclick="stopProp(event)" onchange="stopProp(event);setWaneVal(${i},this.value/100)" onblur="setWaneVal(${i},this.value/100)"> <span style="font-size:.6rem">% waste</span></div>`).join("");
+}
+
+function renderDryChips(){
+  g("dry-chips").innerHTML=DRYING.map((d,i)=>`<div class="chip${dryIdx===i?" active-green":""}" onclick="setDry(${i})">${d.l}<br><input class="chip-edit" type="number" value="${d.m}" min="0" step="0.05" onclick="stopProp(event)" onchange="stopProp(event);setDryMult(${i},this.value)" onblur="setDryMult(${i},this.value)"> <span style="font-size:.6rem">mult</span></div>`).join("");
+}
+
+function renderQualChips(){
+  g("qual-chips").innerHTML=QUALITY.map((q,i)=>`<div class="chip${qualIdx===i?" active-amber":""}" onclick="setQual(${i})"><div style="font-weight:bold;margin:.1rem 0">${q.l}</div><div class="chip-desc">${q.d}</div><br><input class="chip-edit" type="number" value="${q.m}" min="0" step="0.05" onclick="stopProp(event)" onchange="stopProp(event);setQualMult(${i},this.value)" onblur="setQualMult(${i},this.value)"> <span style="font-size:.6rem">mult</span></div>`).join("");
+}
+
+function drawProfile(){
+  const pts=Array.from({length:numPts},(_,i)=>parseFloat(widths[i])||0);
+  const maxW=Math.max(...pts,1);
+  const W=320,H=80;
+  const step=pts.length>1?W/(pts.length-1):W/2;
+  const tp=pts.map((w,i)=>({cx:pts.length===1?W/2:i*step,top:H-12-(w/maxW)*(H-24),bot:H-12,w}));
+  const avgW=pts.filter(p=>p>0).length?pts.filter(p=>p>0).reduce((a,b)=>a+b,0)/pts.filter(p=>p>0).length:0;
+  const avgY=avgW>0?H-12-(avgW/maxW)*(H-24):null;
+  const topLine=tp.map(p=>p.cx+","+p.top).join(" ");
+  const botLine=tp.map(p=>p.cx+","+p.bot).join(" ");
+  const fill=tp.map((p,i)=>(i===0?"M":"L")+p.cx+","+p.top).join(" ")+" "+[...tp].reverse().map(p=>"L"+p.cx+","+p.bot).join(" ")+" Z";
+  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;height:70px">`;
+  if(pts.some(p=>p>0)){
+    svg+=`<path d="${fill}" fill="rgba(245,184,0,0.10)" stroke="none"/>`;
+    svg+=`<polyline points="${topLine}" fill="none" stroke="#f5b800" stroke-width="2"/>`;
+    svg+=`<polyline points="${botLine}" fill="none" stroke="#e0ddd4" stroke-width="1" stroke-dasharray="4,3"/>`;
+  }
+  if(avgY!==null) svg+=`<line x1="0" y1="${avgY}" x2="${W}" y2="${avgY}" stroke="#f5b800" stroke-width="1" stroke-dasharray="6,3" opacity="0.6"/>`;
+  tp.forEach(p=>{
+    svg+=`<line x1="${p.cx}" y1="${p.top}" x2="${p.cx}" y2="${p.bot}" stroke="#ccc" stroke-width="0.5"/>`;
+    svg+=`<circle cx="${p.cx}" cy="${p.top}" r="${p.w>0?3:1.5}" fill="${p.w>0?"#1a1a0e":"#e0ddd4"}"/>`;
+    if(p.w>0) svg+=`<text x="${p.cx}" y="${p.top-5}" text-anchor="middle" fill="#1a1a0e" font-size="7" font-family="Arial">${p.w}"</text>`;
+  });
+  svg+=`</svg><div style="display:flex;justify-content:space-between;margin-top:.2rem"><span style="font-size:.55rem;color:#c8c4b0">End A</span><span style="font-size:.55rem;color:#c8c4b0">End B</span></div>`;
+  return svg;
+}
+
+function pct(a,b){return b?Math.min(100,Math.round((a/b)*100)):0;}
+
+function recalc(){
+  const rate=parseFloat(g("rate").value)||0;
+  const wNums=Array.from({length:numPts},(_,i)=>parseFloat(widths[i])||0).filter(w=>w>0);
+  const avgW=wNums.length?wNums.reduce((a,b)=>a+b,0)/wNums.length:0;
+  const lft=parseFloat(g("lengthFt").value)||0;
+  const tin=parseFloat(g("thickness").value)||0;
+  const gross=tin&&avgW&&lft?(tin*avgW*lft)/12:0;
+  const waneBF=gross*WANE[waneIdx].p;
+  const usable=Math.max(0,gross-waneBF);
+  const waste=gross-usable;
+  const yldPct=gross?Math.round((usable/gross)*100):0;
+  const price=usable*rate*QUALITY[qualIdx].m*DRYING[dryIdx].m*FINISH[finishIdx].m*(1+((parseFloat(g("margin").value)||0)/100));
+  const ppbf=usable?price/usable:0;
+
+  // Update profile without touching input fields
+  g("profile-box").innerHTML=drawProfile();
+  if(avgW>0){g("avg-lbl").style.display="";g("avg-lbl").textContent="avg width: "+avgW.toFixed(2)+'"';}
+  else g("avg-lbl").style.display="none";
+
+  // Update summary
+  if(gross===0){
+    g("summary").innerHTML=`<div class="empty"><div class="empty-dash">—</div><div class="empty-txt">Enter thickness, length,<br>and at least one width to begin</div></div>`;
+    return;
+  }
+  const uPct=pct(usable,gross),wPct=pct(waneBF,gross);
+  g("summary").innerHTML=`
+    <div class="price-hero">
+      <div class="price-lbl">Suggested Asking Price</div>
+      <div class="price-big">$${price.toFixed(0)}</div>
+      <div class="price-range">$${(price*.9).toFixed(0)} – $${(price*1.1).toFixed(0)} reasonable range</div>
+    </div>
+    ${[["Gross Board Feet",gross.toFixed(2)+" BF","#1a1a0e"],["Usable Board Feet",usable.toFixed(2)+" BF","#5aaa3a"],["Wane / Trim",waste.toFixed(2)+" BF","#e05040"],["Yield",yldPct+"%","#f5b800"],["Avg Width",avgW.toFixed(2)+'"',"#1a1a0e"],["Price per BF","$"+ppbf.toFixed(2),"#f5b800"]].map(([k,v,c])=>`<div class="meta-row"><span class="meta-lbl">${k}</span><span class="meta-val" style="color:${c}">${v}</span></div>`).join("")}
+    <div class="sec-lbl">Yield Breakdown</div>
+    <div class="y-bar-wrap"><div class="y-bar-usable" style="width:${uPct}%">${uPct>15?`<span class="y-bar-lbl">${uPct}%</span>`:""}</div><div class="y-bar-wane" style="width:${wPct}%"></div></div>
+    <div class="lgnd"><span style="color:#5aaa3a">■ Usable ${uPct}%</span><span style="color:#8a6030">■ Wane ${wPct}%</span></div>
+    <div class="sec-lbl">Price Build-Up</div>
+    ${[["Base ("+usable.toFixed(1)+" BF × $"+rate+")",(usable*rate).toFixed(2),false],["Quality — "+QUALITY[qualIdx].l+" ×"+QUALITY[qualIdx].m,(usable*rate*QUALITY[qualIdx].m).toFixed(2),false],["Drying — "+DRYING[dryIdx].l+" ×"+DRYING[dryIdx].m,(usable*rate*QUALITY[qualIdx].m*DRYING[dryIdx].m).toFixed(2),false],["Finish — "+FINISH[finishIdx].l+" ×"+FINISH[finishIdx].m,(usable*rate*QUALITY[qualIdx].m*DRYING[dryIdx].m*FINISH[finishIdx].m).toFixed(2),false],["Margin +"+(parseFloat(g("margin").value)||0)+"%",price.toFixed(2),true]].map(([k,v,last])=>`<div class="pb-row${last?" last":""}"><span class="pb-lbl${last?" last":""}">${k}</span><span class="pb-val${last?" last":""}">$${v}</span></div>`).join("")}`;
+}
+
+function openQuoteWindow(autoPrint){
+  const panel = document.getElementById("client-quote-panel");
+  if(!panel){ alert("Generate a quote first."); return; }
+  const styles = Array.from(document.styleSheets).map(ss => {
+    try { return Array.from(ss.cssRules).map(r=>r.cssText).join('\n'); } catch(e){ return ''; }
+  }).join('\n');
+  const printScript = autoPrint ? '<scr'+'ipt>window.onload=function(){window.print();}<\/scr'+'ipt>' : '';
+  const win = window.open('', '_blank');
+  if(!win){ alert("Pop-ups are blocked. Please allow pop-ups for this site in Safari Settings, then try again."); return; }
+  win.document.open();
+  win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CCM Slab Quote</title><style>' + styles + ' body{background:#fff;padding:1rem;} @media print{body{padding:0;}}</style>' + printScript + '</head><body>' + panel.outerHTML + '</body></html>');
+  win.document.close();
+}
+
+function downloadQuoteImage(){ openQuoteWindow(false); }
+
+
+function generateQuote(){
+  const rate=parseFloat(g("rate").value)||0;
+  const wNums=Array.from({length:numPts},(_,i)=>parseFloat(widths[i])||0).filter(w=>w>0);
+  const avgW=wNums.length?wNums.reduce((a,b)=>a+b,0)/wNums.length:0;
+  const lft=parseFloat(g("lengthFt").value)||0;
+  const tin=parseFloat(g("thickness").value)||0;
+  const gross=tin&&avgW&&lft?(tin*avgW*lft)/12:0;
+  if(!gross){
+    let missing=[];
+    if(!tin) missing.push("thickness");
+    if(!lft) missing.push("length");
+    if(!avgW) missing.push("width measurements");
+    alert("Please enter " + missing.join(", ") + " before generating a quote.");
+    return;
+  }
+  const waneBF=gross*WANE[waneIdx].p;
+  const usable=Math.max(0,gross-waneBF);
+  const margin=parseFloat(g("margin").value)||0;
+  const price=usable*rate*QUALITY[qualIdx].m*DRYING[dryIdx].m*FINISH[finishIdx].m*(1+(margin/100));
+  const ppbf=usable?price/usable:0;
+  const speciesEl=g("sp");
+  const speciesName=speciesEl.value==="Custom"?g("customName").value||"Custom":speciesEl.options[speciesEl.selectedIndex].text;
+  const quoteNum="CCM-"+Date.now().toString().slice(-6);
+  const today=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+
+  // Build line items with hidden state
+  window.quoteItems = [
+    {section:"Slab Details", isHeader:true, hidden:false},
+    {key:"Species", val:speciesName, hidden:false},
+    {key:"Thickness", val:tin+'"', hidden:false},
+    {key:"Length", val:lft+"'", hidden:false},
+    {key:"Avg Width", val:avgW.toFixed(2)+'"', hidden:false},
+    {key:"Grade", val:QUALITY[qualIdx].l, hidden:false},
+    {key:"Drying", val:DRYING[dryIdx].l, hidden:false},
+    {key:"Live Edge Wane", val:WANE[waneIdx].l, hidden:false},
+    {key:"Surface Finish", val:FINISH[finishIdx].l, hidden:false},
+    {section:"Board Feet & Pricing", isHeader:true, hidden:false},
+    {key:"Gross Board Feet", val:gross.toFixed(2)+" BF", hidden:false},
+    {key:"Wane Waste", val:((gross-usable)).toFixed(2)+" BF", hidden:false},
+    {key:"Usable Board Feet", val:usable.toFixed(2)+" BF", hidden:false},
+    {key:"Base Rate", val:"$"+rate.toFixed(2)+"/BF", hidden:false},
+    {key:"Quality Multiplier", val:"×"+QUALITY[qualIdx].m.toFixed(2), hidden:false},
+    {key:"Drying Multiplier", val:"×"+DRYING[dryIdx].m.toFixed(2), hidden:false},
+    {key:"Finish Multiplier", val:"×"+FINISH[finishIdx].m.toFixed(2), hidden:false},
+    {key:"Profit Margin", val:margin+"%", hidden:true},
+    {key:"Price per BF", val:"$"+ppbf.toFixed(2), hidden:false},
+  ];
+  window.quotePrice = price;
+  window.quoteNum = quoteNum;
+  window.quoteToday = today;
+  window.quoteCCMLogo = "data:image/png;base64,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";
+
+  renderQuoteOverlay();
+  g("quote-overlay").style.display="block";
+}
+
+function toggleQuoteItem(i){
+  window.quoteItems[i].hidden = !window.quoteItems[i].hidden;
+  renderQuoteOverlay();
+}
+
+function renderQuoteOverlay(){
+  const items = window.quoteItems;
+  const price = window.quotePrice;
+  const quoteNum = window.quoteNum;
+  const today = window.quoteToday;
+  const logo = window.quoteCCMLogo;
+
+  // LEFT PANEL: editor rows
+  const editorRows = items.map((item,i) => {
+    if(item.isHeader) return `<div style="font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#f5b800;padding:.6rem 0 .25rem;margin-top:.6rem;border-bottom:1px solid #333;">${item.section}</div>`;
+    const h = item.hidden;
+    return `<div style="display:flex;align-items:center;gap:.4rem;padding:.32rem 0;border-bottom:1px solid #252510;${h?'opacity:0.45':''}">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.65rem;color:${h?'#666':'#ccc'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.key}</div>
+        <div style="font-size:.65rem;color:${h?'#555':'#f5b800'};font-weight:700;">${item.val}</div>
+      </div>
+      <button onclick="toggleQuoteItem(${i})" style="flex-shrink:0;font-size:.5rem;padding:.18rem .38rem;border:1px solid ${h?'#444':'#f5b800'};border-radius:3px;background:${h?'#2a2a1e':'transparent'};color:${h?'#888':'#f5b800'};cursor:pointer;font-family:Arial,sans-serif;letter-spacing:.06em;font-weight:700;">${h?'SHOW':'HIDE'}</button>
+    </div>`;
+  }).join('');
+
+  // RIGHT PANEL: client-facing quote
+  const slabKeys = ['Species','Thickness','Length','Avg Width','Grade','Drying','Live Edge Wane','Surface Finish'];
+  const visibleSlabItems = items.filter(it=>!it.isHeader && !it.hidden && slabKeys.includes(it.key));
+  const visiblePricingItems = items.filter(it=>!it.isHeader && !it.hidden && !slabKeys.includes(it.key));
+
+  const rowHtml = (it) => `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:.42rem 0;border-bottom:1px solid #f0ede6;font-size:.77rem;">
+    <span style="color:#6b6650;">${it.key}</span>
+    <span style="font-weight:700;color:#1a1a0e;margin-left:.5rem;">${it.val}</span>
+  </div>`;
+
+  const sectionHead = (label) => `<div style="font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#1a1a0e;border-bottom:2px solid #f5b800;padding-bottom:.35rem;margin-bottom:.5rem;">${label}</div>`;
+
+  const clientQuote = `
+    <div style="background:#1a1a0e;padding:1.2rem 1.5rem;display:flex;align-items:center;gap:.75rem;">
+      <img src="${logo}" style="height:54px;width:auto;"/>
+      <div style="flex:1;min-width:0;">
+        <div style="color:#f5b800;font-size:.9rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;">CCM Sawmill &amp; Kiln</div>
+        <div style="color:#aaa890;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;margin-top:.1rem;">Eldred, Illinois · Est. 2022</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="color:#f5b800;font-size:.58rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;">Slab Quote</div>
+        <div style="color:#aaa890;font-size:.52rem;margin-top:.1rem;">#${quoteNum}</div>
+        <div style="color:#aaa890;font-size:.52rem;">${today}</div>
+      </div>
+    </div>
+    <div style="padding:1rem 1.5rem 1.5rem;">
+      ${visibleSlabItems.length ? sectionHead('Slab Details') + visibleSlabItems.map(rowHtml).join('') : ''}
+      ${visiblePricingItems.length ? '<div style="margin-top:1.2rem;"></div>' + sectionHead('Pricing') + visiblePricingItems.map(rowHtml).join('') : ''}
+      <div style="background:#1a1a0e;border-radius:8px;padding:1rem 1.4rem;margin-top:1.4rem;display:flex;justify-content:space-between;align-items:center;">
+        <div style="color:#aaa890;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Suggested Price</div>
+        <div style="color:#f5b800;font-size:1.7rem;font-weight:900;">$${price.toFixed(0)}</div>
+      </div>
+      <div style="text-align:center;color:#aaa890;font-size:.55rem;margin-top:.35rem;">Reasonable range: $${(price*.9).toFixed(0)} – $${(price*1.1).toFixed(0)}</div>
+      <div style="margin-top:1.5rem;padding-top:.75rem;border-top:1px solid #e0ddd4;text-align:center;color:#aaa890;font-size:.52rem;letter-spacing:.06em;">
+        Quote generated by Slab Pricer Pro · Powered by Cozy Dog Furniture
+      </div>
+    </div>`;
+
+  g("quote-content").innerHTML = `
+    <div id="quote-split">
+      <div id="quote-editor-panel">
+        <div style="font-size:.6rem;font-weight:900;color:#f5b800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;padding-bottom:.4rem;border-bottom:1px solid #333;">✏️ Edit Line Items</div>
+        <div style="font-size:.52rem;color:#888;margin-bottom:.6rem;line-height:1.5;">Toggle items to show or hide them on the client quote →</div>
+        ${editorRows}
+      </div>
+      <div id="client-quote-panel">
+        ${clientQuote}
+      </div>
+    </div>`;
+}
+
+// Init
+renderPtBtns();
+renderWidthGrid();
+renderWaneChips();
+renderQualChips();
+renderDryChips();
+renderFinishChips();
+recalc();
+</script>
+
+<!-- Quote Overlay -->
+<div id="quote-overlay">
+  <div id="quote-sheet">
+    <div id="quote-content"></div>
+    <div style="padding:1rem;display:flex;gap:.75rem;justify-content:flex-end;background:#f4f4f0;border-top:1px solid #e0ddd4;flex-wrap:wrap;">
+      <button id="quote-close-btn" onclick="document.getElementById('quote-overlay').style.display='none'" style="padding:.6rem 1.2rem;border:1.5px solid #ccc;border-radius:6px;background:#fff;font-size:.8rem;cursor:pointer;font-family:Arial,sans-serif;">✕ Close</button>
+      <button id="quote-img-btn" onclick="downloadQuoteImage()" style="padding:.6rem 1.4rem;border:none;border-radius:6px;background:#1a1a0e;font-size:.8rem;font-weight:900;cursor:pointer;font-family:Arial,sans-serif;letter-spacing:.06em;color:#f5b800;">🖼 View / Save</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
